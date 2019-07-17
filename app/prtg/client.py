@@ -105,18 +105,17 @@ class ConnectionMethods(object):
                     " Check credentials in config file"
                 )
             )
-        elif req.status_code == 404:
+        if req.status_code == 404:
             raise (
                 ResourceNotFound(
                     "No resource at URL used: {0}".format(url)
                 )
             )
-        else:
-            raise UnhandledStatusCode(
-                'Response code was {0}: {1}'.format(
-                    req.status_code, req.text,
-                )
+        raise UnhandledStatusCode(
+            'Response code was {0}: {1}'.format(
+                req.status_code, req.text,
             )
+        )
 
 
 class BaseConfig(ConnectionMethods):
