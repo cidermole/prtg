@@ -14,7 +14,7 @@
     "docker_application_dirname": "{{ cookiecutter.docker_application_tagname }}",
     "author_email": "hutchris@gmail.com",
     "author_name": "Chris Hutchings",
-    "maintainer_name": "tim.gates@iress.com",
-    "maintainer_email": "Tim Gates",
+    "maintainer_name": "Tim Gates",
+    "maintainer_email": "tim.gates@iress.com",
     "project_email": "{{ cookiecutter.maintainer_email }}"
 }
