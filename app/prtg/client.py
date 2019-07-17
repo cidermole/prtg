@@ -25,6 +25,7 @@ class connection_methods(object):
         self.user = confdata[2]
         self.passhash = confdata[3]
         self.protocol = confdata[4]
+        self.verify = confdata[5]
         self.confdata = confdata
         self.base_url = "{protocol}://{host}:{port}/api/".format(
             protocol=self.protocol, host=self.host, port=self.port
@@ -48,7 +49,7 @@ class connection_methods(object):
                 base=self.base_url_no_api, content=url_string,
                 auth=self.url_auth,
             )
-        req = requests.get(url, verify=False)
+        req = requests.get(url, verify=self.verify)
         if req.status_code == 200:
             return req
         elif req.status_code == 401:
@@ -275,9 +276,9 @@ class prtg_api(global_arrays, baseconfig):
 
     def __init__(
                 self, host, user, passhash, rootid=0, protocol="https",
-                port="443",
+                port="443", verify=True,
             ):
-        self.confdata = (host, port, user, passhash, protocol)
+        self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
         self.clear_arrays()
         self.probes = []
