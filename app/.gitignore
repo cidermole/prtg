@@ -1,3 +1,6 @@
 test-output.xml
+test*py
+testdata
 LICENSE
 README.md
+*~
