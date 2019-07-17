@@ -2,6 +2,8 @@
 """
 Python API client module to manage PRTG servers
 """
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import csv
 from builtins import input as safe_input
@@ -915,8 +917,10 @@ class Probe(Group):
 
 
 class PRTGDevice(BaseConfig):
-    """Separate top level object to manage just a device and its sensors instead of
-    downloading details for an entire group"""
+    """
+    Separate top level object to manage just a device and its sensors instead
+    of downloading details for an entire group
+    """
 
     def __init__(self, host, user, passhash, deviceid, protocol="https",
                  port="443", verify=True):
