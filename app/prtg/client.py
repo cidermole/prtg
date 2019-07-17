@@ -98,7 +98,7 @@ class ConnectionMethods(object):
         req = requests.get(url, verify=self.verify)
         if 200 <= req.status_code <= 299:
             return req
-        elif req.status_code == 401:
+        if req.status_code == 401:
             raise (
                 AuthenticationError(
                     "PRTG authentication failed."
@@ -163,24 +163,24 @@ class BaseConfig(ConnectionMethods):
         """
         if self.type == "Root":
             return "You cannot delete the root object."
-        else:
-            delete_url = "deleteobject.htm?id={objid}&approve=1".format(
-                objid=self.id
-            )
-            if confirm:
-                response = ""
-                while response.upper() not in ["Y", "N"]:
-                    response = safe_input(
-                        "Would you like to continue?(Y/[N])  "
-                    )
-                    if response == "":
-                        response = "N"
-                if response.upper() == "Y":
-                    _ = self.get_request(url_string=delete_url)
-            else:
-                _ = self.get_request(
-                    url_string=delete_url
+        delete_url = "deleteobject.htm?id={objid}&approve=1".format(
+            objid=self.id
+        )
+        if confirm:
+            response = ""
+            while response.upper() not in ["Y", "N"]:
+                response = safe_input(
+                    "Would you like to continue?(Y/[N])  "
                 )
+                if response == "":
+                    response = "N"
+            if response.upper() == "Y":
+                _ = self.get_request(url_string=delete_url)
+        else:
+            _ = self.get_request(
+                url_string=delete_url
+            )
+        return ""
 
     def set_property(self, name, value):
         """
@@ -227,12 +227,11 @@ class BaseConfig(ConnectionMethods):
         if soup.result.text != "(Property not found)":
             setattr(self, name, soup.result.text)
             return soup.result.text
-        else:
-            raise (
-                ResourceNotFound(
-                    "No object property of name: {name}".format(name=name)
-                )
+        raise (
+            ResourceNotFound(
+                "No object property of name: {name}".format(name=name)
             )
+        )
 
     def set_interval(self, interval):
         """
@@ -259,10 +258,9 @@ class BaseConfig(ConnectionMethods):
         # returns the xml as a beautifulsoup object
         if treesoup.sensortree.nodes:
             return treesoup
-        else:
-            raise ResourceNotFound(
-                "No objects at ID: {id}".format(id=root)
-            )
+        raise ResourceNotFound(
+            "No objects at ID: {id}".format(id=root)
+        )
 
     def rename(self, newname):
         """
@@ -1107,7 +1105,8 @@ class PRTGHistoricData(ConnectionMethods):
             protocol=self.protocol, port=self.port, verify=self.verify,
         )
 
-    def format_date(self, dateobj):
+    @staticmethod
+    def format_date(dateobj):
         """Pass a datetime object and this will format appropriately
         for use with the historic data api"""
         return dateobj.strftime("%Y-%m-%d-%H-%M-%S")
