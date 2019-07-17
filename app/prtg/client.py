@@ -8,6 +8,7 @@ from builtins import input as safe_input
 from datetime import datetime
 
 import requests
+
 from bs4 import BeautifulSoup
 
 
@@ -17,9 +18,17 @@ class AuthenticationError(Exception):
     """
 
 
+class UnhandledStatusCode(Exception):
+    """
+    Raised when a non-successful status code is observed calling the API and
+    no expected handling takes place.
+    """
+
+
 class ResourceNotFound(Exception):
     """
-    Raised if requesting a node and PRTG says it is not found
+    Raised if requesting a node and PRTG says it is not found or it can not be
+    located via an ID search
     """
 
 
@@ -86,7 +95,7 @@ class ConnectionMethods(object):
                 auth=self.url_auth,
             )
         req = requests.get(url, verify=self.verify)
-        if req.status_code == 200:
+        if 200 <= req.status_code <= 299:
             return req
         elif req.status_code == 401:
             raise (
@@ -99,6 +108,12 @@ class ConnectionMethods(object):
             raise (
                 ResourceNotFound(
                     "No resource at URL used: {0}".format(url)
+                )
+            )
+        else:
+            raise UnhandledStatusCode(
+                'Response code was {0}: {1}'.format(
+                    req.status_code, req.text,
                 )
             )
 
@@ -117,10 +132,10 @@ class BaseConfig(ConnectionMethods):
         self.status = None
         self.status_raw = None
         self.active = None
-        self.allprobes = []
-        self.allgroups = []
-        self.alldevices = []
-        self.allsensors = []
+        self.allprobes = GlobalArrays.allprobes
+        self.allgroups = GlobalArrays.allgroups
+        self.alldevices = GlobalArrays.alldevices
+        self.allsensors = GlobalArrays.allsensors
 
     def __str__(self):
         return "<Name: {name}, ID: {id}, Active: {active}>".format(
@@ -362,7 +377,6 @@ class PRTGApi(GlobalArrays, BaseConfig):
         super(PRTGApi, self).__init__()
         self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
-        self.clear_arrays()
         self.probes = []
         self.groups = []
         self.devices = []
@@ -374,6 +388,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
         """
         Called to load the local cache
         """
+        self.clear_arrays()
         # get `sensortree` from root id downwards
         self.treesoup = self.get_tree(root=self.id)
         # Finds all the direct child nodes in `sensortree` and creates python
@@ -492,6 +507,9 @@ class PRTGApi(GlobalArrays, BaseConfig):
                     self.allsensors):
             if obj.id == idval:
                 return obj
+        raise ResourceNotFound(
+            'Object with ID {0} not found'.format(idval)
+        )
 
 
 class Channel(PRTGApi):
@@ -630,6 +648,7 @@ class Sensor(PRTGApi):
                 for achannel in self.channels:
                     if achannel.objid == child.find("objid").string:
                         achannel.refresh(child)
+        return self.channels
 
     def refresh(self, refreshsoup=None):
         """
