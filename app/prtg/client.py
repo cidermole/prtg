@@ -1,9 +1,10 @@
 import csv
-import requests
+from builtins import input as safe_input
 from datetime import datetime
+
+import requests
 from bs4 import BeautifulSoup
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from builtins import input as safe_input
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
