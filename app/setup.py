@@ -70,7 +70,7 @@ setup(
     long_description=load_readme('README.md'),
     long_description_content_type='text/markdown',
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-    install_requires=[],
+    install_requires=['bs4', 'requests', 'lxml'],
     url='https://github.com/timgates42/prtg',
     classifiers=[
         'Development Status :: 4 - Beta',
