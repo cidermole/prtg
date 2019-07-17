@@ -228,7 +228,8 @@ class BaseConfig(ConnectionMethods):
 
     def get_tree(self, root=""):
         """
-        Gets sensortree from prtg. If no rootid is provided returns entire tree
+        Gets `sensortree` from prtg. If no `rootid` is provided returns entire
+        tree
         """
         tree_url = (
             "table.xml?content=sensortree"
@@ -336,7 +337,7 @@ class BaseConfig(ConnectionMethods):
 class PRTGApi(GlobalArrays, BaseConfig):
     """
     Parameters:
-    - host: Enter the ip address or hostname where PRTG is running
+    - host: Enter the ip address or `hostname` where PRTG is running
     - port: Enter the tcp port used to connect to prtg. (usually 80 or 443)
     - user: Enter your PRTG username
     - passhash: Enter your PRTG passhash. Can be found in PRTG
@@ -344,7 +345,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
     - protocol: Enter the protocol used to connect to PRTG server (http or
                 https)
     - rootid: Enter the id of the group/probe that contains all the objects
-              you want to manage. Defaults to 0 (gets entire sensortree)
+              you want to manage. Defaults to 0 (gets entire `sensortree`)
 
     Example:
     host = '192.168.1.1'
@@ -365,9 +366,9 @@ class PRTGApi(GlobalArrays, BaseConfig):
         self.probes = []
         self.groups = []
         self.devices = []
-        # get sensortree from root id downwards
+        # get `sensortree` from root id downwards
         self.treesoup = self.get_tree(root=rootid)
-        # Finds all the direct child nodes in sensortree and creates python
+        # Finds all the direct child nodes in `sensortree` and creates python
         # objects, passes each object its xml data
         for child in self.treesoup.sensortree.nodes.children:
             if child.name is not None:
@@ -391,10 +392,10 @@ class PRTGApi(GlobalArrays, BaseConfig):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         if refreshsoup is None:
-            # download fresh sensortree
+            # download fresh `sensortree`
             refreshsoup = self.get_tree(root=self.idval)
         self.treesoup = refreshsoup
         probeids = []
@@ -410,7 +411,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
             groupids.append(agroup.id)
         for adevice in self.devices:
             deviceids.append(adevice.id)
-        # for all the child objects in sensortree, if it already exists
+        # for all the child objects in `sensortree`, if it already exists
         # refresh the object, otherwise create a new one
         for child in self.treesoup.sensortree.nodes.children:
             if child.name is not None:
@@ -424,7 +425,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
                             probeobj = Probe(childr, self.confdata)
                             self.probes.append(probeobj)
                             self.allprobes.append(probeobj)
-                        # add all probe ids from the sensortree to this list
+                        # add all probe ids from the `sensortree` to this list
                         newprobeids.append(childr.find("id").string)
                     elif childr.name == "group":
                         if childr.find("id").string in groupids:
@@ -435,7 +436,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
                             groupobj = Group(childr, self.confdata)
                             self.allgroups.append(groupobj)
                             self.groups.append(groupobj)
-                        # add all probe ids from the sensortree to this list
+                        # add all probe ids from the `sensortree` to this list
                         newgroupids.append(childr.find("id").string)
                     elif childr.name == "device":
                         if childr.find("id").string in deviceids:
@@ -446,14 +447,14 @@ class PRTGApi(GlobalArrays, BaseConfig):
                             deviceobj = Device(childr, self.confdata)
                             self.alldevices.append(deviceobj)
                             self.devices.append(deviceobj)
-                        # add all probe ids from the sensortree to this list
+                        # add all probe ids from the `sensortree` to this list
                         newdeviceids.append(childr.find("id").string)
                     elif childr.name is not None:
                         if childr.string is None:
                             childr.string = ""
                         setattr(self, childr.name, childr.string)
-        # if existing probes were not in the new sensortree, remove from
-        # allprobes
+        # if existing probes were not in the new `sensortree`, remove from
+        # `allprobes`
         for idval in probeids:
             if idval not in newprobeids:
                 for aprobe in self.probes:
@@ -550,7 +551,7 @@ class Channel(PRTGApi):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         channelsoup = refreshsoup
         for child in channelsoup.children:
@@ -605,7 +606,7 @@ class Sensor(PRTGApi):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         sensorsoup = refreshsoup
         if sensorsoup is None:
@@ -710,7 +711,7 @@ class Device(PRTGApi):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         devicesoup = refreshsoup
         if devicesoup is None:
@@ -761,7 +762,7 @@ class Group(PRTGApi):
         self.unpack_config(confdata)
         self.groups = []
         self.devices = []
-        # groupsoup is passed into __init__ method
+        # `groupsoup` is passed into `__init__` method
         # The children objects are either added to this object as an attribute
         # or a device/group object is created
         for child in groupsoup.children:
@@ -782,7 +783,7 @@ class Group(PRTGApi):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         groupsoup = refreshsoup
         if groupsoup is None:
@@ -851,7 +852,7 @@ class Probe(Group):
 
 
 class PRTGDevice(BaseConfig):
-    """Seperate top level object to manage just a device and its sensors instead of
+    """Separate top level object to manage just a device and its sensors instead of
     downloading details for an entire group"""
 
     def __init__(self, host, user, passhash, deviceid, protocol="https",
@@ -881,7 +882,7 @@ class PRTGDevice(BaseConfig):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         soup = refreshsoup
         if soup is None:
@@ -905,7 +906,7 @@ class PRTGDevice(BaseConfig):
 
 
 class PRTGSensor(BaseConfig):
-    """Seperate top level object to manage just a sensor and its channels
+    """Separate top level object to manage just a sensor and its channels
     instead of downloading details for an entire group"""
 
     def __init__(self, host, user, passhash, sensorid, protocol="https",
@@ -925,7 +926,7 @@ class PRTGSensor(BaseConfig):
 
     def refresh(self, refreshsoup=None):
         """
-        Used to supply or reobtain and update local cache
+        Used to supply or obtain and update local cache
         """
         soup = refreshsoup
         if soup is None:
