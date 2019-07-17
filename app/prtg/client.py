@@ -109,7 +109,7 @@ class BaseConfig(ConnectionMethods):
     """
     def __init__(self):
         super(BaseConfig, self).__init__()
-        self.idval = None
+        self.id = None  # pylint: disable=invalid-name
         self.objid = None
         self.sensorid = None
         self.type = None
@@ -124,12 +124,12 @@ class BaseConfig(ConnectionMethods):
 
     def __str__(self):
         return "<Name: {name}, ID: {id}, Active: {active}>".format(
-            name=self.name, id=self.idval, active=self.active
+            name=self.name, id=self.id, active=self.active
         )
 
     def __repr__(self):
         return "<Name: {name}, ID: {id}, Active: {active}>".format(
-            name=self.name, id=self.idval, active=self.active
+            name=self.name, id=self.id, active=self.active
         )
 
     def clear_arrays(self):
@@ -149,7 +149,7 @@ class BaseConfig(ConnectionMethods):
             return "You cannot delete the root object."
         else:
             delete_url = "deleteobject.htm?id={objid}&approve=1".format(
-                objid=self.idval
+                objid=self.id
             )
             if confirm:
                 response = ""
@@ -174,7 +174,7 @@ class BaseConfig(ConnectionMethods):
             setprop_url = (
                 "setobjectproperty.htm?id={objid}"
                 "&name={propname}&value={propval}".format(
-                    objid=self.idval, propname=name, propval=value
+                    objid=self.id, propname=name, propval=value
                 )
             )
         else:
@@ -196,7 +196,7 @@ class BaseConfig(ConnectionMethods):
             getprop_url = (
                 "getobjectproperty.htm?id={objid}"
                 "&name={propname}&show=text".format(
-                    objid=self.idval, propname=name
+                    objid=self.id, propname=name
                 )
             )
         else:
@@ -253,7 +253,7 @@ class BaseConfig(ConnectionMethods):
         Used to call the API to rename an element.
         """
         rename_url = "rename.htm?id={objid}&value={name}".format(
-            objid=self.idval, name=newname
+            objid=self.id, name=newname
         )
         _ = self.get_request(url_string=rename_url)
         self.name = newname
@@ -264,12 +264,12 @@ class BaseConfig(ConnectionMethods):
         """
         if duration > 0:
             pause_url = "pauseobjectfor.htm?id={objid}&duration={time}".format(
-                objid=self.idval, time=str(duration)
+                objid=self.id, time=str(duration)
             )
         else:
             pause_url = (
                 "pause.htm?id={objid}&action=0".format(
-                    objid=self.idval
+                    objid=self.id
                 )
             )
         if message:
@@ -283,7 +283,7 @@ class BaseConfig(ConnectionMethods):
         """
         Resume a paused node to receive any further alerts.
         """
-        resume_url = "pause.htm?id={objid}&action=1".format(objid=self.idval)
+        resume_url = "pause.htm?id={objid}&action=1".format(objid=self.id)
         _ = self.get_request(url_string=resume_url)
         # these are question marks because we don't know what status is after
         # resume
@@ -298,7 +298,7 @@ class BaseConfig(ConnectionMethods):
         status_url = (
             "getobjectstatus.htm?id={objid}"
             "&name={name}&show=text".format(
-                objid=self.idval, name=name
+                objid=self.id, name=name
             )
         )
         req = self.get_request(url_string=status_url)
@@ -315,7 +315,7 @@ class BaseConfig(ConnectionMethods):
         clone_url = (
             "duplicateobject.htm?id={objid}"
             "&name={name}&targetid={newparent}".format(
-                objid=self.idval, name=newname, newparent=newplaceid
+                objid=self.id, name=newname, newparent=newplaceid
             )
         )
         _ = self.get_request(url_string=clone_url)
@@ -366,8 +366,16 @@ class PRTGApi(GlobalArrays, BaseConfig):
         self.probes = []
         self.groups = []
         self.devices = []
+        self.treesoup = None
+        self.id = rootid
+        self.initialize()
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
         # get `sensortree` from root id downwards
-        self.treesoup = self.get_tree(root=rootid)
+        self.treesoup = self.get_tree(root=self.id)
         # Finds all the direct child nodes in `sensortree` and creates python
         # objects, passes each object its xml data
         for child in self.treesoup.sensortree.nodes.children:
@@ -396,7 +404,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
         """
         if refreshsoup is None:
             # download fresh `sensortree`
-            refreshsoup = self.get_tree(root=self.idval)
+            refreshsoup = self.get_tree(root=self.id)
         self.treesoup = refreshsoup
         probeids = []
         newprobeids = []
@@ -491,16 +499,26 @@ class Channel(PRTGApi):
     A channel is a PRTG concept, sensors have a series of channels.
     """
     def __init__(self, channelsoup, sensorid, confdata):
-        super(Channel, self).__init__()
         self.unpack_config(confdata)
         self.sensorid = sensorid
         self.lastvalue = None
-        for child in channelsoup.children:
+        self.id = None
+        self.channelsoup = channelsoup
+        super(Channel, self).__init__(
+            host=self.host, user=self.user, passhash=self.passhash,
+            protocol=self.protocol, port=self.port, verify=self.verify,
+        )
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
+        for child in self.channelsoup.children:
             if child.string is None:
                 child.string = ""
             if child.name is not None:
                 setattr(self, child.name, child.string)
-        self.idval = self.objid
+        self.id = self.objid
         if self.lastvalue is not None:
             if self.lastvalue.replace(".", "").isdigit():
                 try:
@@ -517,10 +535,10 @@ class Channel(PRTGApi):
         self.type = "Channel"
 
     def __str__(self):
-        return "<Name: {name}, ID: {id}>".format(name=self.name, id=self.idval)
+        return "<Name: {name}, ID: {id}>".format(name=self.name, id=self.id)
 
     def __repr__(self):
-        return "<Name: {name}, ID: {id}>".format(name=self.name, id=self.idval)
+        return "<Name: {name}, ID: {id}>".format(name=self.name, id=self.id)
 
     def rename(self, newname):
         self.set_property(name="name", value=newname)
@@ -559,7 +577,7 @@ class Channel(PRTGApi):
                 child.string = ""
             if child.name is not None:
                 setattr(self, child.name, child.string)
-        self.idval = self.objid
+        self.id = self.objid
 
     def delete(self, confirm=True):
         return "You cannot delete a channel"
@@ -570,18 +588,27 @@ class Sensor(PRTGApi):
     Used to monitor a target in PRTG.
     """
     def __init__(self, sensorsoup, deviceid, confdata):
-        super(Sensor, self).__init__()
         self.unpack_config(confdata)
-        for child in sensorsoup.children:
-            if child.string is None:
-                child.string = ""
-            if child.name is not None:
-                setattr(self, child.name, child.string)
-        setattr(self, "attributes", sensorsoup.attrs)
         self.channels = []
         self.type = "Sensor"
         self.deviceid = deviceid
         self.filepath = None
+        self.sensorsoup = sensorsoup
+        super(Sensor, self).__init__(
+            host=self.host, user=self.user, passhash=self.passhash,
+            protocol=self.protocol, port=self.port, verify=self.verify,
+        )
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
+        for child in self.sensorsoup.children:
+            if child.string is None:
+                child.string = ""
+            if child.name is not None:
+                setattr(self, child.name, child.string)
+        setattr(self, "attributes", self.sensorsoup.attrs)
 
     def get_channels(self):
         """
@@ -590,14 +617,14 @@ class Sensor(PRTGApi):
         channel_url = (
             "table.xml?content=channels&output=xml"
             "&columns=name,lastvalue_,objid&id={sensorid}".format(
-                sensorid=self.idval
+                sensorid=self.id
             )
         )
         req = self.get_request(url_string=channel_url)
         channelsoup = BeautifulSoup(req.text, "lxml")
         if not self.channels:
             for child in channelsoup.find_all("item"):
-                self.channels.append(Channel(child, self.idval, self.confdata))
+                self.channels.append(Channel(child, self.id, self.confdata))
         else:
             for child in channelsoup.find_all("item"):
                 for achannel in self.channels:
@@ -610,7 +637,7 @@ class Sensor(PRTGApi):
         """
         sensorsoup = refreshsoup
         if sensorsoup is None:
-            soup = self.get_tree(root=self.idval)
+            soup = self.get_tree(root=self.id)
             sensorsoup = soup.sensortree.nodes.sensor
         for child in sensorsoup.children:
             if child.string is None:
@@ -634,7 +661,7 @@ class Sensor(PRTGApi):
         acknowledge_url = (
             "acknowledgealarm.htm?id={objid}"
             "&ackmsg={string}".format(
-                objid=self.idval, string=message
+                objid=self.id, string=message
             )
         )
         _ = self.get_request(url_string=acknowledge_url)
@@ -666,7 +693,7 @@ class Sensor(PRTGApi):
             "+baseFontSize%3D%27{f}%27".format(
                 ft=filetype,
                 gid=graphid,
-                sid=self.idval,
+                sid=self.id,
                 w=width,
                 h=height,
                 hc=hidden_channels,
@@ -685,12 +712,21 @@ class Device(PRTGApi):
     A physical device that can be monitored by a sensor
     """
     def __init__(self, devicesoup, confdata):
-        super(Device, self).__init__()
         self.unpack_config(confdata)
         self.sensors = []
-        for child in devicesoup.children:
+        self.devicesoup = devicesoup
+        super(Device, self).__init__(
+            host=self.host, user=self.user, passhash=self.passhash,
+            protocol=self.protocol, port=self.port, verify=self.verify,
+        )
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
+        for child in self.devicesoup.children:
             if child.name == "sensor":
-                sensorobj = Sensor(child, self.idval, self.confdata)
+                sensorobj = Sensor(child, self.id, self.confdata)
                 self.sensors.append(sensorobj)
                 self.allsensors.append(sensorobj)
             elif child.name is not None:
@@ -706,7 +742,7 @@ class Device(PRTGApi):
                 self.sensors_by_status[asensor.status].append(asensor)
             else:
                 self.sensors_by_status[asensor.status] = [asensor]
-        setattr(self, "attributes", devicesoup.attrs)
+        setattr(self, "attributes", self.devicesoup.attrs)
         self.type = "Device"
 
     def refresh(self, refreshsoup=None):
@@ -715,7 +751,7 @@ class Device(PRTGApi):
         """
         devicesoup = refreshsoup
         if devicesoup is None:
-            soup = self.get_tree(root=self.idval)
+            soup = self.get_tree(root=self.id)
             devicesoup = soup.sensortree.nodes.device
         sensorids = []
         newsensorids = []
@@ -728,7 +764,7 @@ class Device(PRTGApi):
                         if asensor.id == child.find("id").string:
                             asensor.refresh(child)
                 else:
-                    sensorobj = Sensor(child, self.idval, self.confdata)
+                    sensorobj = Sensor(child, self.id, self.confdata)
                     self.sensors.append(sensorobj)
                     self.allsensors.append(sensorobj)
                 newsensorids.append(child.find("id").string)
@@ -758,14 +794,23 @@ class Group(PRTGApi):
     A Tree Nesting Feature - Groups can contain other Groups and Devices
     """
     def __init__(self, groupsoup, confdata):
-        super(Group, self).__init__()
         self.unpack_config(confdata)
         self.groups = []
         self.devices = []
+        self.groupsoup = groupsoup
+        super(Group, self).__init__(
+            host=self.host, user=self.user, passhash=self.passhash,
+            protocol=self.protocol, port=self.port, verify=self.verify,
+        )
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
         # `groupsoup` is passed into `__init__` method
         # The children objects are either added to this object as an attribute
         # or a device/group object is created
-        for child in groupsoup.children:
+        for child in self.groupsoup.children:
             if child.name == "device":
                 deviceobj = Device(child, self.confdata)
                 self.devices.append(deviceobj)
@@ -778,7 +823,7 @@ class Group(PRTGApi):
                 if child.string is None:
                     child.string = ""
                 setattr(self, child.name, child.string)
-        setattr(self, "attributes", groupsoup.attrs)
+        setattr(self, "attributes", self.groupsoup.attrs)
         self.type = "Group"
 
     def refresh(self, refreshsoup=None):
@@ -788,10 +833,10 @@ class Group(PRTGApi):
         groupsoup = refreshsoup
         if groupsoup is None:
             if self.type == "Group":
-                soup = self.get_tree(root=self.idval)
+                soup = self.get_tree(root=self.id)
                 groupsoup = soup.sensortree.nodes.group
             elif self.type == "Probe":
-                soup = self.get_tree(root=self.idval)
+                soup = self.get_tree(root=self.id)
                 groupsoup = soup.sensortree.nodes.probenode
         deviceids = []
         newdeviceids = []
@@ -856,24 +901,32 @@ class PRTGDevice(BaseConfig):
     downloading details for an entire group"""
 
     def __init__(self, host, user, passhash, deviceid, protocol="https",
-                 port="443"):
-        super(PRTGDevice, self).__init__()
-        self.confdata = (host, port, user, passhash, protocol)
+                 port="443", verify=True):
+        self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
         self.sensors = []
+        self.sensors_by_status = {
+            "Up": [], "Down": [], "Warning": [], "Paused": []
+        }
         self.deviceid = deviceid
-        soup = self.get_tree(root=deviceid)
+        super(PRTGDevice, self).__init__(
+            host=self.host, user=self.user, passhash=self.passhash,
+            protocol=self.protocol, port=self.port, verify=self.verify,
+        )
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
+        soup = self.get_tree(root=self.deviceid)
         for child in soup.sensortree.nodes.device:
             if child.name == "sensor":
-                sensorobj = Sensor(child, self.idval, self.confdata)
+                sensorobj = Sensor(child, self.id, self.confdata)
                 self.sensors.append(sensorobj)
             elif child.name is not None:
                 if child.string is None:
                     child.string = ""
                 setattr(self, child.name, child.string)
-        self.sensors_by_status = {
-            "Up": [], "Down": [], "Warning": [], "Paused": []
-        }
         for asensor in self.sensors:
             if asensor.status in self.sensors_by_status.keys():
                 self.sensors_by_status[asensor.status].append(asensor)
@@ -897,7 +950,7 @@ class PRTGDevice(BaseConfig):
                         if asensor.id == child.find("id").string:
                             asensor.refresh(child)
                 else:
-                    sensorobj = Sensor(child, self.idval, self.confdata)
+                    sensorobj = Sensor(child, self.id, self.confdata)
                     self.sensors.append(sensorobj)
             elif child.name is not None:
                 if child.string is None:
@@ -910,19 +963,25 @@ class PRTGSensor(BaseConfig):
     instead of downloading details for an entire group"""
 
     def __init__(self, host, user, passhash, sensorid, protocol="https",
-                 port="443"):
-        super(PRTGSensor, self).__init__()
-        self.confdata = (host, port, user, passhash, protocol)
+                 port="443", verify=True):
+        self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
         self.channels = []
-        soup = self.get_tree(root=sensorid)
+        self.sensorid = sensorid
+        self.filepath = None
+        super(PRTGSensor, self).__init__()
+
+    def initialize(self):
+        """
+        Called to load the local cache
+        """
+        soup = self.get_tree(root=self.sensorid)
         for child in soup.sensortree.nodes.sensor:
             if child.name is not None:
                 if child.string is None:
                     child.string = ""
                 setattr(self, child.name, child.string)
         self.get_channels()
-        self.filepath = None
 
     def refresh(self, refreshsoup=None):
         """
@@ -930,7 +989,7 @@ class PRTGSensor(BaseConfig):
         """
         soup = refreshsoup
         if soup is None:
-            soup = self.get_tree(root=self.idval)
+            soup = self.get_tree(root=self.id)
         sensorsoup = soup.sensortree.nodes.sensor
         for child in sensorsoup.children:
             if child.string is None:
@@ -947,14 +1006,14 @@ class PRTGSensor(BaseConfig):
         channel_url = (
             "table.xml?content=channels&output=xml"
             "&columns=name,lastvalue_,objid&id={sensorid}".format(
-                sensorid=self.idval
+                sensorid=self.id
             )
         )
         req = self.get_request(url_string=channel_url)
         channelsoup = BeautifulSoup(req.text, "lxml")
         if not self.channels:
             for child in channelsoup.find_all("item"):
-                self.channels.append(Channel(child, self.idval, self.confdata))
+                self.channels.append(Channel(child, self.id, self.confdata))
         else:
             for child in channelsoup.find_all("item"):
                 for achannel in self.channels:
@@ -968,7 +1027,7 @@ class PRTGSensor(BaseConfig):
         acknowledge_url = (
             "acknowledgealarm.htm?id={objid}"
             "&ackmsg={string}".format(
-                objid=self.idval, string=message
+                objid=self.id, string=message
             )
         )
         _ = self.get_request(url_string=acknowledge_url)
@@ -999,7 +1058,7 @@ class PRTGSensor(BaseConfig):
             "%3D%271%27+baseFontSize%3D%27{f}%27".format(
                 ft=filetype,
                 gid=graphid,
-                sid=self.idval,
+                sid=self.id,
                 w=width,
                 h=height,
                 hc=hidden_channels,
@@ -1018,10 +1077,13 @@ class PRTGHistoricData(ConnectionMethods):
     Call the class first using connection params then use
     methods to get/process data. yyyy-mm-dd-hh-mm-ss"""
 
-    def __init__(self, host, port, user, passhash, protocol):
-        super(PRTGHistoricData, self).__init__()
-        self.confdata = (host, port, user, passhash, protocol)
+    def __init__(self, host, port, user, passhash, protocol, verify=True):
+        self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
+        super(PRTGHistoricData, self).__init__(
+            host=self.host, user=self.user, passhash=self.passhash,
+            protocol=self.protocol, port=self.port, verify=self.verify,
+        )
 
     def format_date(self, dateobj):
         """Pass a datetime object and this will format appropriately
