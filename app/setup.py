@@ -60,10 +60,10 @@ setup(
     version=read_version(),
     author='Chris Hutchings',
     author_email='hutchris@gmail.com',
-    maintainer='tim.gates@iress.com',
-    maintainer_email='Tim Gates',
+    maintainer='Tim Gates',
+    maintainer_email='tim.gates@iress.com',
     packages=[PACKAGE_NAME],
-    license='GPLv3+',
+    license='MIT',
     description=(
         'Python module to manage PRTG servers'
     ),
@@ -85,6 +85,6 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: MIT',
     ],
 )
