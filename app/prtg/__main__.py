@@ -3,8 +3,7 @@ Module load handler for execution via:
 
 python -m prtg
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import (absolute_import, division, print_function)
 
 import getpass
 
