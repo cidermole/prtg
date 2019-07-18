@@ -19,7 +19,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 def get_api(**kwargs):
     """
-    Handle command line kwargs to constuct API object
+    Handle command line arguments to construct API object
     """
     url = kwargs['url']
     urlp = urlparse(url)

@@ -109,7 +109,7 @@ method.
 
 The set\_property method is very powerful and flexible. You can change anything
 for an object that you can change in the objects settings tab in the web ui. I
-will add the more commonly used settings as seperate methods. You can use the
+will add the more commonly used settings as separate methods. You can use the
 get\_property method to test the name of the property:
 
 ```
