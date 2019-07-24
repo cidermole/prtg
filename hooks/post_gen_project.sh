@@ -7,4 +7,6 @@ TOP="$(dirname "${BASEDIR}")"
 
 cd "${TOP}"
 git checkout -- \
+ app/.pylintrc \
+ README.md \
  LICENSE

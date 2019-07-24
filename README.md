@@ -2,11 +2,26 @@
 
 Python module to manage PRTG servers
 
+[![Build Status](https://dev.azure.com/timgates/timgates/_apis/build/status/timgates42.prtg?branchName=master)](https://dev.azure.com/timgates/timgates/_build/latest?definitionId=14&branchName=master)
+[![PyPi version](https://img.shields.io/pypi/v/prtg.svg)](https://pypi.org/project/prtg)
+[![Python Versions](https://img.shields.io/pypi/pyversions/prtg.svg)](https://pypi.org/project/prtg)
+[![PyPi downloads per month](https://img.shields.io/pypi/dm/prtg.svg)](https://pypi.org/project/prtg)
+[![Documentation Status](https://readthedocs.org/projects/prtg/badge/?version=latest)](https://prtg.readthedocs.io/en/latest/?badge=latest)
+
+# Additional Documentation:
+* [Online Documentation](https://prtg.readthedocs.io/en/latest/)
+* [News](NEWS.rst).
+* [Template Updates](COOKIECUTTER_UPDATES.md).
+* [Code of Conduct](CODE_OF_CONDUCT.md).
+* [Contribution Guidelines](CONTRIBUTING.md).
+
 ## Prerequisites:
 
 - bs4 (BeautifulSoup)
-- requests
+- click
+- future
 - lxml
+- requests
 
 ## Installation
 
