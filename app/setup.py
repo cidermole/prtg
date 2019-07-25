@@ -10,7 +10,7 @@ import os
 import re
 
 # External Imports
-from setuptools import setup
+from setuptools import find_packages, setup
 
 PACKAGE_NAME = 'prtg'
 
@@ -62,7 +62,7 @@ setup(
     author_email='hutchris@gmail.com',
     maintainer='Tim Gates',
     maintainer_email='tim.gates@iress.com',
-    packages=[PACKAGE_NAME],
+    packages=find_packages(exclude=['tests']),
     license='MIT',
     description=(
         'Python module to manage PRTG servers'
@@ -70,9 +70,13 @@ setup(
     long_description=load_readme('README.md'),
     long_description_content_type='text/markdown',
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-    install_requires=['bs4', 'requests', 'lxml'],
+    install_requires=[
+        elem for elem in
+        'bs4\nclick\nfuture\nlxml\nrequests'.split('\n')
+        if elem
+    ],
     url='https://github.com/timgates42/prtg',
-    classifiers=[
+    classifiers=[elem for elem in [
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
@@ -86,5 +90,5 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: MIT License',
-    ],
+    ] if elem],
 )
