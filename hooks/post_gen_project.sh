@@ -10,5 +10,4 @@ git checkout -- \
  app/prtg \
  app/tests \
  app/.pylintrc \
- README.md \
  LICENSE
