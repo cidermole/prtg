@@ -1,5 +1,5 @@
 bs4
 click
 future
-lxml==4.3.4
+lxml
 requests
