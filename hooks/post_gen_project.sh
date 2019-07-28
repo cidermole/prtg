@@ -7,8 +7,8 @@ TOP="$(dirname "${BASEDIR}")"
 
 cd "${TOP}"
 git checkout -- \
+ app/pip/3.4/app/requirements.txt \
  app/prtg \
  app/tests \
  app/.pylintrc \
- README.md \
  LICENSE
