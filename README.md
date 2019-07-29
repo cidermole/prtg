@@ -210,7 +210,7 @@ license, "prtg" is free and open source software
 
 # Issues
 
-If you encounter any problems, please 
+If you encounter any problems, please
 [file an issue](https://github.com/timgates42/prtg/issues)
 along with a detailed description.
 
