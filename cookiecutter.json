@@ -27,12 +27,20 @@
     "readthedocs_name": "{{ cookiecutter.project_name }}",
     "app_requirements": "bs4\nclick\nfuture\nlxml\nrequests",
     "cov_fail_under": "0",
-    "python_requires": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
-    "python_versions": "2.7 3.4 3.5 3.6 3.7",
-    "classifier_pytwo": "Programming Language :: Python :: 2",
-    "classifier_pytwoseven": "Programming Language :: Python :: 2.7",
     "travis_status_url": "https://travis-ci.org/{{ cookiecutter.github_org }}/{{ cookiecutter.github_repo }}.svg?branch=master",
     "travis_build_url": "https://travis-ci.org/{{ cookiecutter.github_org }}/{{ cookiecutter.github_repo }}",
-    "appveyor_status_url": "https://ci.appveyor.com/api/projects/status/github/{{ cookiecutter.github_org }}/{{ cookiecutter.github_repo }}/branch/master?svg=true",
-    "appveyor_build_url": "https://ci.appveyor.com/project/{{ cookiecutter.github_org }}/{{ cookiecutter.github_repo }}"
+    "appveyor_org": "appveyor_user_goes_here",
+    "appveyor_repo": "{{ cookiecutter.github_repo }}",
+    "appveyor_status_url": "https://ci.appveyor.com/api/projects/status/github/{{ cookiecutter.appveyor_org }}/{{ cookiecutter.appveyor_repo }}/branch/master?svg=true",
+    "appveyor_build_url": "https://ci.appveyor.com/project/{{ cookiecutter.appveyor_org }}/{{ cookiecutter.appveyor_repo }}",
+    "installation_notes": "",
+    "extended_readme": "",
+    "supports_pytwo": [
+        "yes",
+        "no"
+    ],
+    "license": [
+        "MIT",
+        "GPLv3+"
+    ]
 }
