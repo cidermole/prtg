@@ -1,42 +1,48 @@
 # prtg
 
+[![Azure Status](https://dev.azure.com/timgates/timgates/_apis/build/status/timgates42.prtg?branchName=master)](https://dev.azure.com/timgates/timgates/_build/latest?definitionId=14&branchName=master)
+[![Travis Status](https://travis-ci.org/timgates42/prtg.svg?branch=master)](https://travis-ci.org/timgates42/prtg)
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/timgates42/prtg/branch/master?svg=true)](https://ci.appveyor.com/project/timgates42/prtg)
+[![PyPI version](https://img.shields.io/pypi/v/prtg.svg)](https://pypi.org/project/prtg)
+[![Python Versions](https://img.shields.io/pypi/pyversions/prtg.svg)](https://pypi.org/project/prtg)
+[![PyPI downloads per month](https://img.shields.io/pypi/dm/prtg.svg)](https://pypi.org/project/prtg)
+[![Documentation Status](https://readthedocs.org/projects/prtg/badge/?version=latest)](https://prtg.readthedocs.io/en/latest/?badge=latest)
+[![Coverage Status](https://coveralls.io/repos/github/timgates42/prtg/badge.svg)](https://coveralls.io/github/timgates42/prtg/)
+
 Python module to manage PRTG servers
 
-[![Build Status](https://dev.azure.com/timgates/timgates/_apis/build/status/timgates42.prtg?branchName=master)](https://dev.azure.com/timgates/timgates/_build/latest?definitionId=14&branchName=master)
-[![PyPi version](https://img.shields.io/pypi/v/prtg.svg)](https://pypi.org/project/prtg)
-[![Python Versions](https://img.shields.io/pypi/pyversions/prtg.svg)](https://pypi.org/project/prtg)
-[![PyPi downloads per month](https://img.shields.io/pypi/dm/prtg.svg)](https://pypi.org/project/prtg)
-[![Documentation Status](https://readthedocs.org/projects/prtg/badge/?version=latest)](https://prtg.readthedocs.io/en/latest/?badge=latest)
+# Installation
 
-# Additional Documentation:
-* [Online Documentation](https://prtg.readthedocs.io/en/latest/)
-* [News](NEWS.rst).
-* [Template Updates](COOKIECUTTER_UPDATES.md).
-* [Code of Conduct](CODE_OF_CONDUCT.md).
-* [Contribution Guidelines](CONTRIBUTING.md).
+You can install prtg for
+[Python](https://www.python.org/) via
+[pip](https://pypi.org/project/pip/)
+from [PyPI](https://pypi.org/).
+
+```
+$ pip install prtg
+```
+
+Note: if using Python 3.4 the latest version of lxml only supports python 3.5 and above so install lxml 4.3.4
+
 
 ## Prerequisites:
-
-- bs4 (BeautifulSoup)
+- bs4
 - click
 - future
 - lxml
 - requests
 
-## Installation
 
-Can be installed via pip:
+## Download from PyPI.org
 
-```
-pip install prtg
-```
+https://pypi.org/project/prtg/
 
-## Warnings
+# Warnings
 
 Tested only on Python 3.5.2 so far. Does work with python 2.7 but not
 extensively tested. 
 
-## Description
+# Description
 
 This is a Python module to facilitate in managing PRTG servers from CLI or for
 automating changes. It is really useful for scripting changes to prtg objects.
@@ -149,18 +155,18 @@ from prtg import PRTGApi
 prtg = PRTGApi('192.168.1.1','prtgadmin','0000000000')
 
 for device in prtg.alldevices:
-  if device.id == "1234":
+  if device.id == '1234':
     deviceobj = device
 
 deviceobj.pause()
-deviceobj.clone(newname="cloned device",newplaceid="2468")
+deviceobj.clone(newname='cloned device',newplaceid='2468')
 
 time.sleep(10)
 
 prtg.refresh()
 
 for device in prtg.alldevices:
-  if device.name = "cloned device":
+  if device.name = 'cloned device':
     device.resume()
 
 ```
@@ -184,3 +190,34 @@ sensorid = '2123'
 
 sensor = PRTGSensor(host,port,user,passhash,protocol,sensorid)
 ```
+
+# Contributing
+
+Contributions are very welcome, consider using the
+[file an issue](https://github.com/timgates42/prtg/issues)
+to discuss the work before beginning, but if you already have a Pull Request
+ready then this is no problem, please submit it and it will be very gratefully
+considered. The [Contribution Guidelines](CONTRIBUTING.md)
+outlines the prtg-dev commitment to ensuring all
+contributions receive appropriate recognition.
+
+# License
+
+
+Distributed under the terms of the [MIT](http://opensource.org/licenses/MIT)
+license, "prtg" is free and open source software
+
+
+# Issues
+
+If you encounter any problems, please
+[file an issue](https://github.com/timgates42/prtg/issues)
+along with a detailed description.
+
+# Additional Documentation:
+
+* [Online Documentation](https://prtg.readthedocs.io/en/latest/)
+* [News](NEWS.rst).
+* [Template Updates](COOKIECUTTER_UPDATES.md).
+* [Code of Conduct](CODE_OF_CONDUCT.md).
+* [Contribution Guidelines](CONTRIBUTING.md).
