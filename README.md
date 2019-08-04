@@ -2,7 +2,7 @@
 
 [![Azure Status](https://dev.azure.com/timgates/timgates/_apis/build/status/timgates42.prtg?branchName=master)](https://dev.azure.com/timgates/timgates/_build/latest?definitionId=14&branchName=master)
 [![Travis Status](https://travis-ci.org/timgates42/prtg.svg?branch=master)](https://travis-ci.org/timgates42/prtg)
-[![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/timgates42/prtg/branch/master?svg=true)](https://ci.appveyor.com/project/timgates42/prtg)
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/n12n1eymr9khlmvt/branch/master?svg=true)](https://ci.appveyor.com/project/timgates42/prtg)
 [![PyPI version](https://img.shields.io/pypi/v/prtg.svg)](https://pypi.org/project/prtg)
 [![Python Versions](https://img.shields.io/pypi/pyversions/prtg.svg)](https://pypi.org/project/prtg)
 [![PyPI downloads per month](https://img.shields.io/pypi/dm/prtg.svg)](https://pypi.org/project/prtg)
@@ -10,6 +10,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/timgates42/prtg/badge.svg)](https://coveralls.io/github/timgates42/prtg/)
 
 Python module to manage PRTG servers
+
+More details can be found in the
+[Online Documentation.](https://prtg.readthedocs.io/en/latest/)
 
 # Installation
 
