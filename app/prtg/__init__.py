@@ -2,14 +2,8 @@
 Module load point
 """
 
-from .client import (
-    AuthenticationError,
-    PRTGApi,
-    PRTGDevice,
-    PRTGHistoricData,
-    PRTGSensor,
-    ResourceNotFound,
-)
+from .client import (AuthenticationError, PRTGApi, PRTGDevice, PRTGHistoricData,
+                     PRTGSensor, ResourceNotFound)
 from .version import __version__
 
 __all__ = [
