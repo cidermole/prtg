@@ -7,6 +7,8 @@ TOP="$(dirname "${BASEDIR}")"
 
 cd "${TOP}"
 git checkout -- \
+ app/.isort.cfg \
+ app/setup.cfg \
  app/pip/3.4/app/requirements.txt \
  app/prtg \
  app/tests \

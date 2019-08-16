@@ -13,26 +13,23 @@ from six.moves.urllib.parse import urlparse
 from .client import PRTGApi
 from .version import __version__ as app_version
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 def get_api(**kwargs):
     """
     Handle command line arguments to construct API object
     """
-    url = kwargs['url']
+    url = kwargs["url"]
     urlp = urlparse(url)
-    passhash = getpass.getpass('PassHash: ')
+    passhash = getpass.getpass("PassHash: ")
     api = PRTGApi(
         host=urlp.hostname,
-        user=kwargs['user'],
+        user=kwargs["user"],
         passhash=passhash,
-        rootid=kwargs['rootid'],
+        rootid=kwargs["rootid"],
         protocol=urlp.scheme,
-        port=urlp.port if urlp.port else {
-            'https': 443,
-            'http': 80,
-        }[urlp.scheme],
+        port=urlp.port if urlp.port else {"https": 443, "http": 80}[urlp.scheme],
     )
     return api
 
@@ -69,9 +66,9 @@ def main():
 
 
 @main.command()
-@click.argument('url')
-@click.option('--user', default='admin', help='Authentication Username')
-@click.option('--rootid', default=0, help='PRTG ID of Root Node to Display')
+@click.argument("url")
+@click.option("--user", default="admin", help="Authentication Username")
+@click.option("--rootid", default=0, help="PRTG ID of Root Node to Display")
 def show(**kwargs):
     """
     Runs the display command
@@ -79,5 +76,5 @@ def show(**kwargs):
     run_show(**kwargs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

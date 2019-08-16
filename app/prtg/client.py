@@ -2,8 +2,7 @@
 """
 Python API client module to manage PRTG servers
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
 from builtins import input as safe_input
@@ -37,6 +36,7 @@ class GlobalArrays(object):
     """
     class used by PRTGApi and children to manage global arrays of all objects
     """
+
     allprobes = []
     allgroups = []
     alldevices = []
@@ -48,6 +48,7 @@ class ConnectionMethods(object):
     class used by all prtg_* objects to build urls and query prtg using
     requests
     """
+
     def __init__(self):
         self.host = None
         self.port = None
@@ -92,8 +93,7 @@ class ConnectionMethods(object):
             )
         else:
             url = "{base}{content}&{auth}".format(
-                base=self.base_url_no_api, content=url_string,
-                auth=self.url_auth,
+                base=self.base_url_no_api, content=url_string, auth=self.url_auth
             )
         req = requests.get(url, verify=self.verify)
         if 200 <= req.status_code <= 299:
@@ -101,20 +101,13 @@ class ConnectionMethods(object):
         if req.status_code == 401:
             raise (
                 AuthenticationError(
-                    "PRTG authentication failed."
-                    " Check credentials in config file"
+                    "PRTG authentication failed." " Check credentials in config file"
                 )
             )
         if req.status_code == 404:
-            raise (
-                ResourceNotFound(
-                    "No resource at URL used: {0}".format(url)
-                )
-            )
+            raise ResourceNotFound("No resource at URL used: {0}".format(url))
         raise UnhandledStatusCode(
-            'Response code was {0}: {1}'.format(
-                req.status_code, req.text,
-            )
+            "Response code was {0}: {1}".format(req.status_code, req.text)
         )
 
 
@@ -122,6 +115,7 @@ class BaseConfig(ConnectionMethods):
     """
     Base class used for common PRTG functionality
     """
+
     def __init__(self):
         super(BaseConfig, self).__init__()
         self.id = None  # pylint: disable=invalid-name
@@ -162,23 +156,17 @@ class BaseConfig(ConnectionMethods):
         """
         if self.type == "Root":
             return "You cannot delete the root object."
-        delete_url = "deleteobject.htm?id={objid}&approve=1".format(
-            objid=self.id
-        )
+        delete_url = "deleteobject.htm?id={objid}&approve=1".format(objid=self.id)
         if confirm:
             response = ""
             while response.upper() not in ["Y", "N"]:
-                response = safe_input(
-                    "Would you like to continue?(Y/[N])  "
-                )
+                response = safe_input("Would you like to continue?(Y/[N])  ")
                 if response == "":
                     response = "N"
             if response.upper() == "Y":
                 _ = self.get_request(url_string=delete_url)
         else:
-            _ = self.get_request(
-                url_string=delete_url
-            )
+            _ = self.get_request(url_string=delete_url)
         return ""
 
     def set_property(self, name, value):
@@ -196,8 +184,7 @@ class BaseConfig(ConnectionMethods):
             setprop_url = (
                 "setobjectproperty.htm?id={objid}&subid={subid}"
                 "&name={propname}&value={propval}".format(
-                    objid=self.sensorid, subid=self.objid, propname=name,
-                    propval=value,
+                    objid=self.sensorid, subid=self.objid, propname=name, propval=value
                 )
             )
         _ = self.get_request(url_string=setprop_url)
@@ -210,9 +197,7 @@ class BaseConfig(ConnectionMethods):
         if self.type != "Channel":
             getprop_url = (
                 "getobjectproperty.htm?id={objid}"
-                "&name={propname}&show=text".format(
-                    objid=self.id, propname=name
-                )
+                "&name={propname}&show=text".format(objid=self.id, propname=name)
             )
         else:
             getprop_url = (
@@ -226,11 +211,7 @@ class BaseConfig(ConnectionMethods):
         if soup.result.text != "(Property not found)":
             setattr(self, name, soup.result.text)
             return soup.result.text
-        raise (
-            ResourceNotFound(
-                "No object property of name: {name}".format(name=name)
-            )
-        )
+        raise ResourceNotFound("No object property of name: {name}".format(name=name))
 
     def set_interval(self, interval):
         """
@@ -245,11 +226,8 @@ class BaseConfig(ConnectionMethods):
         Gets `sensortree` from prtg. If no `rootid` is provided returns entire
         tree
         """
-        tree_url = (
-            "table.xml?content=sensortree"
-            "&output=xml&id={rootid}".format(
-                rootid=root
-            )
+        tree_url = "table.xml?content=sensortree" "&output=xml&id={rootid}".format(
+            rootid=root
         )
         req = self.get_request(url_string=tree_url)
         raw_data = req.text
@@ -257,9 +235,7 @@ class BaseConfig(ConnectionMethods):
         # returns the xml as a beautifulsoup object
         if treesoup.sensortree.nodes:
             return treesoup
-        raise ResourceNotFound(
-            "No objects at ID: {id}".format(id=root)
-        )
+        raise ResourceNotFound("No objects at ID: {id}".format(id=root))
 
     def rename(self, newname):
         """
@@ -280,11 +256,7 @@ class BaseConfig(ConnectionMethods):
                 objid=self.id, time=str(duration)
             )
         else:
-            pause_url = (
-                "pause.htm?id={objid}&action=0".format(
-                    objid=self.id
-                )
-            )
+            pause_url = "pause.htm?id={objid}&action=0".format(objid=self.id)
         if message:
             pause_url += "&pausemsg={string}".format(string=message)
         _ = self.get_request(url_string=pause_url)
@@ -308,11 +280,8 @@ class BaseConfig(ConnectionMethods):
         """
         Retrieve the status of this element.
         """
-        status_url = (
-            "getobjectstatus.htm?id={objid}"
-            "&name={name}&show=text".format(
-                objid=self.id, name=name
-            )
+        status_url = "getobjectstatus.htm?id={objid}" "&name={name}&show=text".format(
+            objid=self.id, name=name
         )
         req = self.get_request(url_string=status_url)
         soup = BeautifulSoup(req.text, "lxml")
@@ -370,8 +339,9 @@ class PRTGApi(GlobalArrays, BaseConfig):
     prtg = PRTGApi(host,user,passhash,rootid,protocol,port)
     """
 
-    def __init__(self, host, user, passhash, rootid=0, protocol="https",
-                 port="443", verify=True):
+    def __init__(  # pylint: disable=bad-continuation
+        self, host, user, passhash, rootid=0, protocol="https", port="443", verify=True
+    ):
         super(PRTGApi, self).__init__()
         self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
@@ -501,19 +471,17 @@ class PRTGApi(GlobalArrays, BaseConfig):
         of data.
         """
         idval = str(idval)
-        for obj in (self.allprobes + self.allgroups + self.alldevices +
-                    self.allsensors):
+        for obj in self.allprobes + self.allgroups + self.alldevices + self.allsensors:
             if obj.id == idval:
                 return obj
-        raise ResourceNotFound(
-            'Object with ID {0} not found'.format(idval)
-        )
+        raise ResourceNotFound("Object with ID {0} not found".format(idval))
 
 
 class Channel(PRTGApi):
     """
     A channel is a PRTG concept, sensors have a series of channels.
     """
+
     def __init__(self, channelsoup, sensorid, confdata):
         self.unpack_config(confdata)
         self.sensorid = sensorid
@@ -521,8 +489,12 @@ class Channel(PRTGApi):
         self.id = None
         self.channelsoup = channelsoup
         super(Channel, self).__init__(
-            host=self.host, user=self.user, passhash=self.passhash,
-            protocol=self.protocol, port=self.port, verify=self.verify,
+            host=self.host,
+            user=self.user,
+            passhash=self.passhash,
+            protocol=self.protocol,
+            port=self.port,
+            verify=self.verify,
         )
 
     def initialize(self):
@@ -567,20 +539,14 @@ class Channel(PRTGApi):
                 objid=self.sensorid, time=duration
             )
         else:
-            pause_url = (
-                "pause.htm?id={objid}&action=0&".format(
-                    objid=self.sensorid
-                )
-            )
+            pause_url = "pause.htm?id={objid}&action=0&".format(objid=self.sensorid)
         if message:
             pause_url += "&pausemsg={string}".format(string=message)
         _ = self.get_request(url_string=pause_url)
 
     def resume(self):
         print("Channels cannot be resumed, resuming parent sensor.")
-        resume_url = (
-            "pause.htm?id={objid}&action=1".format(objid=self.sensorid)
-        )
+        resume_url = "pause.htm?id={objid}&action=1".format(objid=self.sensorid)
         _ = self.get_request(url_string=resume_url)
 
     def refresh(self, refreshsoup=None):
@@ -603,6 +569,7 @@ class Sensor(PRTGApi):
     """
     Used to monitor a target in PRTG.
     """
+
     def __init__(self, sensorsoup, deviceid, confdata):
         self.unpack_config(confdata)
         self.channels = []
@@ -611,8 +578,12 @@ class Sensor(PRTGApi):
         self.filepath = None
         self.sensorsoup = sensorsoup
         super(Sensor, self).__init__(
-            host=self.host, user=self.user, passhash=self.passhash,
-            protocol=self.protocol, port=self.port, verify=self.verify,
+            host=self.host,
+            user=self.user,
+            passhash=self.passhash,
+            protocol=self.protocol,
+            port=self.port,
+            verify=self.verify,
         )
 
     def initialize(self):
@@ -632,9 +603,7 @@ class Sensor(PRTGApi):
         """
         channel_url = (
             "table.xml?content=channels&output=xml"
-            "&columns=name,lastvalue_,objid&id={sensorid}".format(
-                sensorid=self.id
-            )
+            "&columns=name,lastvalue_,objid&id={sensorid}".format(sensorid=self.id)
         )
         req = self.get_request(url_string=channel_url)
         channelsoup = BeautifulSoup(req.text, "lxml")
@@ -675,17 +644,13 @@ class Sensor(PRTGApi):
         """
         Used indicate a response to an alarm
         """
-        acknowledge_url = (
-            "acknowledgealarm.htm?id={objid}"
-            "&ackmsg={string}".format(
-                objid=self.id, string=message
-            )
+        acknowledge_url = "acknowledgealarm.htm?id={objid}" "&ackmsg={string}".format(
+            objid=self.id, string=message
         )
         _ = self.get_request(url_string=acknowledge_url)
         self.get_status()
 
-    def save_graph(self, graphid, filepath, size, hidden_channels="",
-                   filetype="svg"):
+    def save_graph(self, graphid, filepath, size, hidden_channels="", filetype="svg"):
         """
         Size options: S,M,L
         """
@@ -728,13 +693,18 @@ class Device(PRTGApi):
     """
     A physical device that can be monitored by a sensor
     """
+
     def __init__(self, devicesoup, confdata):
         self.unpack_config(confdata)
         self.sensors = []
         self.devicesoup = devicesoup
         super(Device, self).__init__(
-            host=self.host, user=self.user, passhash=self.passhash,
-            protocol=self.protocol, port=self.port, verify=self.verify,
+            host=self.host,
+            user=self.user,
+            passhash=self.passhash,
+            protocol=self.protocol,
+            port=self.port,
+            verify=self.verify,
         )
 
     def initialize(self):
@@ -751,9 +721,7 @@ class Device(PRTGApi):
                     child.string = ""
                 setattr(self, child.name, child.string)
         # Adds sensors to a dictionary based on their status
-        self.sensors_by_status = {
-            "Up": [], "Down": [], "Warning": [], "Paused": []
-        }
+        self.sensors_by_status = {"Up": [], "Down": [], "Warning": [], "Paused": []}
         for asensor in self.sensors:
             if asensor.status in self.sensors_by_status.keys():
                 self.sensors_by_status[asensor.status].append(asensor)
@@ -810,14 +778,19 @@ class Group(PRTGApi):
     """
     A Tree Nesting Feature - Groups can contain other Groups and Devices
     """
+
     def __init__(self, groupsoup, confdata):
         self.unpack_config(confdata)
         self.groups = []
         self.devices = []
         self.groupsoup = groupsoup
         super(Group, self).__init__(
-            host=self.host, user=self.user, passhash=self.passhash,
-            protocol=self.protocol, port=self.port, verify=self.verify,
+            host=self.host,
+            user=self.user,
+            passhash=self.passhash,
+            protocol=self.protocol,
+            port=self.port,
+            verify=self.verify,
         )
 
     def initialize(self):
@@ -910,6 +883,7 @@ class Probe(Group):
     Probe is the same as group so it inherits all methods and attributes except
     type
     """
+
     type = "Probe"
 
 
@@ -919,18 +893,21 @@ class PRTGDevice(BaseConfig):
     of downloading details for an entire group
     """
 
-    def __init__(self, host, user, passhash, deviceid, protocol="https",
-                 port="443", verify=True):
+    def __init__(  # pylint: disable=bad-continuation
+        self, host, user, passhash, deviceid, protocol="https", port="443", verify=True
+    ):
         self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
         self.sensors = []
-        self.sensors_by_status = {
-            "Up": [], "Down": [], "Warning": [], "Paused": []
-        }
+        self.sensors_by_status = {"Up": [], "Down": [], "Warning": [], "Paused": []}
         self.deviceid = deviceid
         super(PRTGDevice, self).__init__(
-            host=self.host, user=self.user, passhash=self.passhash,
-            protocol=self.protocol, port=self.port, verify=self.verify,
+            host=self.host,
+            user=self.user,
+            passhash=self.passhash,
+            protocol=self.protocol,
+            port=self.port,
+            verify=self.verify,
         )
 
     def initialize(self):
@@ -981,8 +958,9 @@ class PRTGSensor(BaseConfig):
     """Separate top level object to manage just a sensor and its channels
     instead of downloading details for an entire group"""
 
-    def __init__(self, host, user, passhash, sensorid, protocol="https",
-                 port="443", verify=True):
+    def __init__(  # pylint: disable=bad-continuation
+        self, host, user, passhash, sensorid, protocol="https", port="443", verify=True
+    ):
         self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
         self.channels = []
@@ -1024,9 +1002,7 @@ class PRTGSensor(BaseConfig):
         """
         channel_url = (
             "table.xml?content=channels&output=xml"
-            "&columns=name,lastvalue_,objid&id={sensorid}".format(
-                sensorid=self.id
-            )
+            "&columns=name,lastvalue_,objid&id={sensorid}".format(sensorid=self.id)
         )
         req = self.get_request(url_string=channel_url)
         channelsoup = BeautifulSoup(req.text, "lxml")
@@ -1043,16 +1019,12 @@ class PRTGSensor(BaseConfig):
         """
         Used to indicate a response to a sensor being investigated.
         """
-        acknowledge_url = (
-            "acknowledgealarm.htm?id={objid}"
-            "&ackmsg={string}".format(
-                objid=self.id, string=message
-            )
+        acknowledge_url = "acknowledgealarm.htm?id={objid}" "&ackmsg={string}".format(
+            objid=self.id, string=message
         )
         _ = self.get_request(url_string=acknowledge_url)
 
-    def save_graph(self, graphid, filepath, size, hidden_channels="",
-                   filetype="svg"):
+    def save_graph(self, graphid, filepath, size, hidden_channels="", filetype="svg"):
         """
         Size options: S,M,L
         """
@@ -1100,8 +1072,12 @@ class PRTGHistoricData(ConnectionMethods):
         self.confdata = (host, port, user, passhash, protocol, verify)
         self.unpack_config(self.confdata)
         super(PRTGHistoricData, self).__init__(
-            host=self.host, user=self.user, passhash=self.passhash,
-            protocol=self.protocol, port=self.port, verify=self.verify,
+            host=self.host,
+            user=self.user,
+            passhash=self.passhash,
+            protocol=self.protocol,
+            port=self.port,
+            verify=self.verify,
         )
 
     @staticmethod
