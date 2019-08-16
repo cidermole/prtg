@@ -105,7 +105,7 @@ class ConnectionMethods(object):
                 )
             )
         if req.status_code == 404:
-            raise (ResourceNotFound("No resource at URL used: {0}".format(url)))
+            raise ResourceNotFound("No resource at URL used: {0}".format(url))
         raise UnhandledStatusCode(
             "Response code was {0}: {1}".format(req.status_code, req.text)
         )
@@ -211,7 +211,7 @@ class BaseConfig(ConnectionMethods):
         if soup.result.text != "(Property not found)":
             setattr(self, name, soup.result.text)
             return soup.result.text
-        raise (ResourceNotFound("No object property of name: {name}".format(name=name)))
+        raise ResourceNotFound("No object property of name: {name}".format(name=name))
 
     def set_interval(self, interval):
         """
@@ -339,7 +339,7 @@ class PRTGApi(GlobalArrays, BaseConfig):
     prtg = PRTGApi(host,user,passhash,rootid,protocol,port)
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=bad-continuation
         self, host, user, passhash, rootid=0, protocol="https", port="443", verify=True
     ):
         super(PRTGApi, self).__init__()
@@ -893,7 +893,7 @@ class PRTGDevice(BaseConfig):
     of downloading details for an entire group
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=bad-continuation
         self, host, user, passhash, deviceid, protocol="https", port="443", verify=True
     ):
         self.confdata = (host, port, user, passhash, protocol, verify)
@@ -958,7 +958,7 @@ class PRTGSensor(BaseConfig):
     """Separate top level object to manage just a sensor and its channels
     instead of downloading details for an entire group"""
 
-    def __init__(
+    def __init__(  # pylint: disable=bad-continuation
         self, host, user, passhash, sensorid, protocol="https", port="443", verify=True
     ):
         self.confdata = (host, port, user, passhash, protocol, verify)
